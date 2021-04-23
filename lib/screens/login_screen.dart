@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         children: <Widget>[
                           const Text(
-                            '¡Bienvenid@ a Asteroid Todo!',
+                            '¡Welcome to Asteroid TODOs!',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 22,
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 16),
                           OneLineTextField(
-                            labelText: 'Contraseña (12345678)',
+                            labelText: 'Password (12345678)',
                             icon: Icons.vpn_key,
                             focusColor: Colors.deepOrange,
                             obscureText: true,
@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           else
                             PrincipalActionButton(
                               onPressed: () => _signIn(context),
-                              text: 'Ingresar',
+                              text: 'Sign In',
                             ),
                         ],
                       ),

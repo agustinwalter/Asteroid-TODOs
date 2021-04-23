@@ -1,3 +1,4 @@
+import 'package:asteroid_todo/providers/todo_provider.dart';
 import 'package:asteroid_todo/providers/user_provider.dart';
 import 'package:asteroid_todo/screens/first_loading_screen.dart';
 import 'package:asteroid_todo/screens/init_error_screen.dart';
@@ -13,6 +14,7 @@ void main() {
     MultiProvider(
       providers: <ChangeNotifierProvider<dynamic>>[
         ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+        ChangeNotifierProvider<TodosProvider>(create: (_) => TodosProvider()),
       ],
       child: const AsteroidTodo(),
     ),
