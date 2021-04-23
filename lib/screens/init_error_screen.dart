@@ -5,8 +5,10 @@ class InitErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Something went wrong, come back later please 😢'),
+    return const Scaffold(
+      body: Center(
+        child: Text('Something went wrong, come back later please 😢'),
+      ),
     );
   }
 }
