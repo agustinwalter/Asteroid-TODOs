@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "422070200051",
+    "project_id": "asteroid-todo",
+    "storage_bucket": "asteroid-todo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422070200051:android:d08c78e2551b64e4abf986",
+        "android_client_info": {
+          "package_name": "com.asteroid.todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "422070200051-lq6p2d7ovku67o2q53kek04d5qspb6b3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAqYhuEffZanPp4C75eOR57R23OgOm1So"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "422070200051-lq6p2d7ovku67o2q53kek04d5qspb6b3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
