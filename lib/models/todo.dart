@@ -23,6 +23,20 @@ class Todo {
   final String description;
   final Timestamp lastModified;
 
+  Todo copyWith({
+    String uid,
+    String title,
+    String description,
+    Timestamp lastModified,
+  }) {
+    return Todo(
+      uid: uid ?? this.uid,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      lastModified: lastModified ?? this.lastModified,
+    );
+  }
+
   Map<String, Object> toJson() {
     return <String, Object>{
       'title': title,

@@ -32,25 +32,27 @@ class OneLineTextField extends StatelessWidget {
         onEditingComplete: onEditingComplete,
         obscureText: obscureText,
         keyboardType: keyboardType,
+        maxLines: obscureText ? 1 : 5,
+        minLines: 1,
         decoration: InputDecoration(
           labelText: labelText,
           contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          prefixIcon: Icon(icon),
+          prefixIcon: icon != null ? Icon(icon) : null,
           errorMaxLines: 2,
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(22),
             borderSide: BorderSide(color: focusColor),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(22),
             borderSide: const BorderSide(color: Colors.grey),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(22),
             borderSide: const BorderSide(color: Colors.red),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(22),
             borderSide: const BorderSide(color: Colors.red),
           ),
         ),

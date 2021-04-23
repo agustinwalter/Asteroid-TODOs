@@ -2,6 +2,7 @@ import 'package:asteroid_todo/models/todo.dart';
 import 'package:asteroid_todo/providers/todo_provider.dart';
 import 'package:asteroid_todo/providers/user_provider.dart';
 import 'package:asteroid_todo/widgets/todos/todo_card.dart';
+import 'package:asteroid_todo/widgets/todos/todo_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +11,20 @@ class TodosScreen extends StatelessWidget {
 
   Future<void> _signOut(BuildContext context) async {
     await Provider.of<UserProvider>(context, listen: false).signOut();
+  }
+
+  void _showAddTodoDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => TodoDialog(
+        title: 'Add new TODO',
+        buttonText: 'Add!',
+        onButtonClick: (Todo todo) {
+          Provider.of<TodosProvider>(context, listen: false).addTodo(todo);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   @override
@@ -37,7 +52,7 @@ class TodosScreen extends StatelessWidget {
 
         return ListView.builder(
           itemCount: todos.length,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 136),
           itemBuilder: (_, int index) => TodoCard(todo: todos[index]),
         );
       }),
@@ -53,7 +68,7 @@ class TodosScreen extends StatelessWidget {
           const SizedBox(height: 16),
           // Add todo
           FloatingActionButton(
-            onPressed: () {},
+            onPressed: () => _showAddTodoDialog(context),
             child: const Icon(Icons.add),
           )
         ],
