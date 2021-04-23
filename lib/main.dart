@@ -1,11 +1,22 @@
+import 'package:asteroid_todo/providers/user_provider.dart';
 import 'package:asteroid_todo/screens/first_loading_screen.dart';
 import 'package:asteroid_todo/screens/init_error_screen.dart';
+import 'package:asteroid_todo/screens/login_screen.dart';
+import 'package:asteroid_todo/screens/todos_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const AsteroidTodo());
+  runApp(
+    MultiProvider(
+      providers: <ChangeNotifierProvider<dynamic>>[
+        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+      ],
+      child: const AsteroidTodo(),
+    ),
+  );
 }
 
 class AsteroidTodo extends StatelessWidget {
@@ -25,23 +36,36 @@ class HomeScreen extends StatelessWidget {
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
+  void _initUser(BuildContext context) {
+    Provider.of<UserProvider>(context, listen: false).initUser();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<FirebaseApp>(
-        future: _initialization,
-        builder: (_, AsyncSnapshot<FirebaseApp> snapshot) {
-          if (snapshot.hasError) {
-            return const InitErrorScreen();
-          }
+    return FutureBuilder<FirebaseApp>(
+      future: _initialization,
+      builder: (_, AsyncSnapshot<FirebaseApp> snapshot) {
+        if (snapshot.hasError) {
+          return const InitErrorScreen();
+        }
 
-          if (snapshot.connectionState == ConnectionState.done) {
-            return const Text('Ok!');
-          }
+        if (snapshot.connectionState == ConnectionState.done) {
+          _initUser(context);
 
-          return const FirstLoadingScreen();
-        },
-      ),
+          return Consumer<UserProvider>(
+            builder: (_, UserProvider userProvider, __) {
+              if (userProvider.user != null) {
+                // User is logged!
+                return const TodosScreen();
+              }
+
+              return const LoginScreen();
+            },
+          );
+        }
+
+        return const FirstLoadingScreen();
+      },
     );
   }
 }
