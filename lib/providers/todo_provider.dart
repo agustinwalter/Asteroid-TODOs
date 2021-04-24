@@ -16,32 +16,33 @@ class TodosProvider extends ChangeNotifier {
     });
   }
 
-  void addTodo(Todo todo) {
-    todosDB
-        .add(todo.toJson())
-        .then((DocumentReference value) => print('Todo Added'))
-        .catchError((dynamic error) => print('Failed to add todo: $error'));
+  /// Add a todo, throw an [AlreadyExistsException] if a todo with that [title] already exists.
+  Future<void> addTodo(Todo todo) async {
+    final Todo todoInDB = await searchByTitle(todo.title);
+    if (todoInDB == null) {
+      await todosDB.add(todo.toJson());
+    } else {
+      throw AlreadyExistsException('There is already a TODO with this title.');
+    }
   }
 
-  void editTodo(Todo todo) {
-    todosDB
-        .doc(todo.uid)
-        .update(todo.toJson())
-        .then((void value) => print('Todo Updated'))
-        .catchError((dynamic error) => print('Failed to update todo: $error'));
+  /// Edit a todo, throw an [AlreadyExistsException] if a todo with that [title] already exists.
+  Future<void> editTodo(Todo todo) async {
+    final Todo todoInDB = await searchByTitle(todo.title);
+    if (todoInDB == null || todo.uid == todoInDB?.uid) {
+      await todosDB.doc(todo.uid).update(todo.toJson());
+    } else {
+      throw AlreadyExistsException('There is already a TODO with this title.');
+    }
   }
 
-  void deleteTodo(String uid) {
-    todosDB
-        .doc(uid)
-        .delete()
-        .then((void value) => print('Todo Deleted'))
-        .catchError((dynamic error) => print('Failed to delete todo: $error'));
-  }
+  /// Delete a todo based on its [uid].
+  Future<void> deleteTodo(String uid) async => todosDB.doc(uid).delete();
 
+  /// Search a todo based on its [title], returns [null] if none is found.
   Future<Todo> searchByTitle(String title) async {
     final QuerySnapshot res = await todosDB.where('title', isEqualTo: title).get();
-    if (res.docs.isNotEmpty) {
+    if (res.size == 1) {
       return Todo.fromJson(<String, Object>{
         'uid': res.docs[0].id,
         ...res.docs[0].data(),
@@ -49,4 +50,9 @@ class TodosProvider extends ChangeNotifier {
     }
     return null;
   }
+}
+
+class AlreadyExistsException implements Exception {
+  AlreadyExistsException(this.message);
+  String message;
 }
