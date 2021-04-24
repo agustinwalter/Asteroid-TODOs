@@ -38,4 +38,15 @@ class TodosProvider extends ChangeNotifier {
         .then((void value) => print('Todo Deleted'))
         .catchError((dynamic error) => print('Failed to delete todo: $error'));
   }
+
+  Future<Todo> searchByTitle(String title) async {
+    final QuerySnapshot res = await todosDB.where('title', isEqualTo: title).get();
+    if (res.docs.isNotEmpty) {
+      return Todo.fromJson(<String, Object>{
+        'uid': res.docs[0].id,
+        ...res.docs[0].data(),
+      });
+    }
+    return null;
+  }
 }

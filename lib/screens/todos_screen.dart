@@ -1,6 +1,7 @@
 import 'package:asteroid_todo/models/todo.dart';
 import 'package:asteroid_todo/providers/todo_provider.dart';
 import 'package:asteroid_todo/providers/user_provider.dart';
+import 'package:asteroid_todo/screens/search_screen.dart';
 import 'package:asteroid_todo/widgets/todos/todo_card.dart';
 import 'package:asteroid_todo/widgets/todos/todo_dialog.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,13 @@ class TodosScreen extends StatelessWidget {
           Navigator.pop(context);
         },
       ),
+    );
+  }
+
+  void _goToSearchScreen(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(builder: (_) => const SearchScreen()),
     );
   }
 
@@ -61,9 +69,10 @@ class TodosScreen extends StatelessWidget {
         children: <Widget>[
           // Search todo
           FloatingActionButton(
-            onPressed: () {},
+            onPressed: () => _goToSearchScreen(context),
             child: const Icon(Icons.search),
             mini: true,
+            heroTag: 'search',
           ),
           const SizedBox(height: 16),
           // Add todo
