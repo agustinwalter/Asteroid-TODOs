@@ -11,6 +11,8 @@ class TodoCard extends StatelessWidget {
 
   final Todo todo;
 
+  static const String _noImage = 'https://virtual.trivo.com.ec/img/no-img-placeholder.png';
+
   void _showEditTodoDialog(BuildContext context) {
     showDialog<void>(
       context: context,
@@ -58,6 +60,13 @@ class TodoCard extends StatelessWidget {
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: ListTile(
+            contentPadding: const EdgeInsets.all(8),
+            visualDensity: VisualDensity.compact,
+            minVerticalPadding: 0,
+            leading: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(todo.imageUrl ?? _noImage),
+            ),
             title: Text(todo.title),
             subtitle: Text(todo.description),
           ),

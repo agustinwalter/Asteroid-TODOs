@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:asteroid_todo/models/todo.dart';
 import 'package:asteroid_todo/widgets/common/one_line_textfield.dart';
 import 'package:asteroid_todo/widgets/common/principal_action_button.dart';
+import 'package:asteroid_todo/widgets/common/secondary_action_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TodoDialog extends StatefulWidget {
   const TodoDialog({
@@ -25,6 +28,9 @@ class TodoDialog extends StatefulWidget {
 class _TodoDialogState extends State<TodoDialog> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final ImagePicker picker = ImagePicker();
+
+  File _prevImage;
 
   @override
   void initState() {
@@ -40,6 +46,37 @@ class _TodoDialogState extends State<TodoDialog> {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  void _onPrincipalButtonClick() {
+    if (widget.todo != null) {
+      widget.onButtonClick(
+        widget.todo.copyWith(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          localImage: _prevImage,
+          lastModified: Timestamp.now(),
+        ),
+      );
+    } else {
+      widget.onButtonClick(
+        Todo(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          localImage: _prevImage,
+          lastModified: Timestamp.now(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final PickedFile pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _prevImage = File(pickedFile.path);
+      }
+    });
   }
 
   @override
@@ -68,32 +105,38 @@ class _TodoDialogState extends State<TodoDialog> {
             textInputAction: TextInputAction.newline,
             controller: _descriptionController,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          _image(),
+          const SizedBox(height: 8),
+          SecondaryActionButton(onPressed: _pickImage, text: 'Upload image!'),
+          const SizedBox(height: 8),
           PrincipalActionButton(
-            onPressed: () {
-              if (widget.todo != null) {
-                widget.onButtonClick(
-                  widget.todo.copyWith(
-                    title: _titleController.text,
-                    description: _descriptionController.text,
-                    lastModified: Timestamp.now(),
-                  ),
-                );
-              } else {
-                widget.onButtonClick(
-                  Todo(
-                    title: _titleController.text,
-                    description: _descriptionController.text,
-                    lastModified: Timestamp.now(),
-                  ),
-                );
-              }
-            },
+            onPressed: _onPrincipalButtonClick,
             text: widget.buttonText,
           ),
         ],
       ),
       contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
     );
+  }
+
+  Widget _image() {
+    if (_prevImage != null) {
+      return Image.file(
+        _prevImage,
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+      );
+    }
+    if (widget.todo?.imageUrl != null) {
+      return Image.network(
+        widget.todo?.imageUrl,
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

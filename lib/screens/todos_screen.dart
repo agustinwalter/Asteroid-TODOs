@@ -38,6 +38,7 @@ class TodosScreen extends StatelessWidget {
       showErrorToast(e.message);
     } catch (e) {
       showErrorToast('Something went wrong, please try again.');
+      print(e);
     }
   }
 
