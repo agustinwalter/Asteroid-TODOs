@@ -1,5 +1,6 @@
 import 'package:asteroid_todo/models/todo.dart';
 import 'package:asteroid_todo/providers/todo_provider.dart';
+import 'package:asteroid_todo/widgets/common/error_toast.dart';
 import 'package:asteroid_todo/widgets/todos/todo_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -10,6 +11,8 @@ class TodoCard extends StatelessWidget {
 
   final Todo todo;
 
+  static const String _noImage = 'https://virtual.trivo.com.ec/img/no-img-placeholder.png';
+
   void _showEditTodoDialog(BuildContext context) {
     showDialog<void>(
       context: context,
@@ -17,16 +20,34 @@ class TodoCard extends StatelessWidget {
         title: 'Edit TODO',
         buttonText: 'Save!',
         todo: todo,
-        onButtonClick: (Todo todo) {
-          Provider.of<TodosProvider>(context, listen: false).editTodo(todo);
-          Navigator.pop(context);
-        },
+        onButtonClick: (Todo todo) => _editTodo(context, todo),
       ),
     );
   }
 
-  void _deleteTodo(BuildContext context) {
-    Provider.of<TodosProvider>(context, listen: false).deleteTodo(todo.uid);
+  Future<void> _editTodo(BuildContext context, Todo todo) async {
+    if (todo.title.isEmpty || todo.description.isEmpty) {
+      showErrorToast('Both title and description are required.');
+      return;
+    }
+    try {
+      await Provider.of<TodosProvider>(context, listen: false).editTodo(todo);
+      Navigator.pop(context);
+    } on AlreadyExistsException catch (e) {
+      showErrorToast(e.message);
+    } catch (e) {
+      showErrorToast('Something went wrong, please try again.');
+      print(e);
+    }
+  }
+
+  Future<void> _deleteTodo(BuildContext context) async {
+    try {
+      await Provider.of<TodosProvider>(context, listen: false).deleteTodo(todo.uid);
+    } catch (e) {
+      showErrorToast('Something went wrong, please try again.');
+      print(e);
+    }
   }
 
   @override
@@ -39,6 +60,13 @@ class TodoCard extends StatelessWidget {
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: ListTile(
+            contentPadding: const EdgeInsets.all(8),
+            visualDensity: VisualDensity.compact,
+            minVerticalPadding: 0,
+            leading: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(todo.imageUrl ?? _noImage),
+            ),
             title: Text(todo.title),
             subtitle: Text(todo.description),
           ),

@@ -2,6 +2,7 @@ import 'package:asteroid_todo/models/todo.dart';
 import 'package:asteroid_todo/providers/todo_provider.dart';
 import 'package:asteroid_todo/providers/user_provider.dart';
 import 'package:asteroid_todo/screens/search_screen.dart';
+import 'package:asteroid_todo/widgets/common/error_toast.dart';
 import 'package:asteroid_todo/widgets/todos/todo_card.dart';
 import 'package:asteroid_todo/widgets/todos/todo_dialog.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +21,25 @@ class TodosScreen extends StatelessWidget {
       builder: (_) => TodoDialog(
         title: 'Add new TODO',
         buttonText: 'Add!',
-        onButtonClick: (Todo todo) {
-          Provider.of<TodosProvider>(context, listen: false).addTodo(todo);
-          Navigator.pop(context);
-        },
+        onButtonClick: (Todo todo) => _addTodo(context, todo),
       ),
     );
+  }
+
+  Future<void> _addTodo(BuildContext context, Todo todo) async {
+    if (todo.title.isEmpty || todo.description.isEmpty) {
+      showErrorToast('Both title and description are required.');
+      return;
+    }
+    try {
+      await Provider.of<TodosProvider>(context, listen: false).addTodo(todo);
+      Navigator.pop(context);
+    } on AlreadyExistsException catch (e) {
+      showErrorToast(e.message);
+    } catch (e) {
+      showErrorToast('Something went wrong, please try again.');
+      print(e);
+    }
   }
 
   void _goToSearchScreen(BuildContext context) {

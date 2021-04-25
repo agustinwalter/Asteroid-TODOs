@@ -14,8 +14,6 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  Todo todo;
-
   @override
   void initState() {
     _searchController.addListener(() {
@@ -33,8 +31,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> _search(String title) async {
-    todo = await Provider.of<TodosProvider>(context, listen: false).searchByTitle(title);
-    setState(() {});
+    Provider.of<TodosProvider>(context, listen: false).searchByTitle(title);
   }
 
   @override
@@ -44,7 +41,11 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-      body: _body(),
+      body: Consumer<TodosProvider>(
+        builder: (_, TodosProvider todosProvider, __) => _body(
+          todosProvider.searchedTodo,
+        ),
+      ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -85,17 +86,17 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _body() {
+  Widget _body(Todo searchedTodo) {
     if (_searchController.text.isEmpty) {
       return const SizedBox.shrink();
     }
-    if (todo == null) {
+    if (searchedTodo == null) {
       return const Center(child: Text('Nothing found 😢'));
     }
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 80, 16, 0),
-        child: TodoCard(todo: todo),
+        child: TodoCard(todo: searchedTodo),
       ),
     );
   }
