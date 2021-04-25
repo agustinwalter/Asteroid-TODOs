@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:asteroid_todo/models/todo.dart';
+import 'package:asteroid_todo/providers/todo_provider.dart';
 import 'package:asteroid_todo/widgets/common/one_line_textfield.dart';
 import 'package:asteroid_todo/widgets/common/principal_action_button.dart';
 import 'package:asteroid_todo/widgets/common/secondary_action_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class TodoDialog extends StatefulWidget {
   const TodoDialog({
@@ -81,42 +83,56 @@ class _TodoDialogState extends State<TodoDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      title: Text(
-        widget.title,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
         children: <Widget>[
-          OneLineTextField(
-            textInputAction: TextInputAction.next,
-            labelText: 'Title',
-            focusColor: Colors.deepOrange,
-            controller: _titleController,
-          ),
-          const SizedBox(height: 16),
-          OneLineTextField(
-            labelText: 'Description',
-            focusColor: Colors.deepOrange,
-            textInputAction: TextInputAction.newline,
-            controller: _descriptionController,
-          ),
-          const SizedBox(height: 8),
-          _image(),
-          const SizedBox(height: 8),
-          SecondaryActionButton(onPressed: _pickImage, text: 'Upload image!'),
-          const SizedBox(height: 8),
-          PrincipalActionButton(
-            onPressed: _onPrincipalButtonClick,
-            text: widget.buttonText,
+          AlertDialog(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+            title: Text(
+              widget.title,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                OneLineTextField(
+                  textInputAction: TextInputAction.next,
+                  labelText: 'Title',
+                  focusColor: Colors.deepOrange,
+                  controller: _titleController,
+                ),
+                const SizedBox(height: 16),
+                OneLineTextField(
+                  labelText: 'Description',
+                  focusColor: Colors.deepOrange,
+                  textInputAction: TextInputAction.newline,
+                  controller: _descriptionController,
+                ),
+                const SizedBox(height: 8),
+                _image(),
+                const SizedBox(height: 8),
+                SecondaryActionButton(onPressed: _pickImage, text: 'Upload image!'),
+                const SizedBox(height: 8),
+                Consumer<TodosProvider>(
+                  builder: (_, TodosProvider todoProvider, __) {
+                    if (todoProvider.settingTodo) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return PrincipalActionButton(
+                      onPressed: _onPrincipalButtonClick,
+                      text: widget.buttonText,
+                    );
+                  },
+                ),
+              ],
+            ),
+            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
           ),
         ],
       ),
-      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
     );
   }
 

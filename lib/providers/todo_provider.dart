@@ -8,6 +8,7 @@ class TodosProvider extends ChangeNotifier {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   List<Todo> todos = <Todo>[];
+  bool settingTodo = false;
 
   void getAllTodos() {
     _todosDB.orderBy('lastModified', descending: true).snapshots().listen((QuerySnapshot event) {
@@ -22,6 +23,8 @@ class TodosProvider extends ChangeNotifier {
 
   /// Add a todo, throw an [AlreadyExistsException] if a todo with that [title] already exists.
   Future<void> addTodo(Todo todo) async {
+    settingTodo = true;
+    notifyListeners();
     final Todo todoInDB = await searchByTitle(todo.title);
     if (todoInDB == null) {
       final DocumentReference doc = await _todosDB.add(todo.toJson());
@@ -29,10 +32,14 @@ class TodosProvider extends ChangeNotifier {
     } else {
       throw AlreadyExistsException('There is already a TODO with this title.');
     }
+    settingTodo = false;
+    notifyListeners();
   }
 
   /// Edit a todo, throw an [AlreadyExistsException] if a todo with that [title] already exists.
   Future<void> editTodo(Todo todo) async {
+    settingTodo = true;
+    notifyListeners();
     final Todo todoInDB = await searchByTitle(todo.title);
     if (todoInDB == null || todo.uid == todoInDB?.uid) {
       await _todosDB.doc(todo.uid).update(todo.toJson());
@@ -40,6 +47,8 @@ class TodosProvider extends ChangeNotifier {
     } else {
       throw AlreadyExistsException('There is already a TODO with this title.');
     }
+    settingTodo = false;
+    notifyListeners();
   }
 
   /// Delete a todo based on its [uid].
