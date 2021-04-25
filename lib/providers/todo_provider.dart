@@ -11,6 +11,7 @@ class TodosProvider extends ChangeNotifier {
 
   void getAllTodos() {
     _todosDB.orderBy('lastModified', descending: true).snapshots().listen((QuerySnapshot event) {
+      // TODO(agustinwalter): You can do it better...
       todos.clear();
       for (final QueryDocumentSnapshot doc in event.docs) {
         todos.add(Todo.fromJson(<String, Object>{'uid': doc.id, ...doc.data()}));
