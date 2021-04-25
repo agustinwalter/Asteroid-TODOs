@@ -9,6 +9,7 @@ class TodosProvider extends ChangeNotifier {
 
   List<Todo> todos = <Todo>[];
   bool settingTodo = false;
+  Todo searchedTodo;
 
   void getAllTodos() {
     _todosDB.orderBy('lastModified', descending: true).snapshots().listen((QuerySnapshot event) {
@@ -29,11 +30,13 @@ class TodosProvider extends ChangeNotifier {
     if (todoInDB == null) {
       final DocumentReference doc = await _todosDB.add(todo.toJson());
       await _uploadImage(todo, doc.id);
+      settingTodo = false;
+      notifyListeners();
     } else {
+      settingTodo = false;
+      notifyListeners();
       throw AlreadyExistsException('There is already a TODO with this title.');
     }
-    settingTodo = false;
-    notifyListeners();
   }
 
   /// Edit a todo, throw an [AlreadyExistsException] if a todo with that [title] already exists.
@@ -44,25 +47,35 @@ class TodosProvider extends ChangeNotifier {
     if (todoInDB == null || todo.uid == todoInDB?.uid) {
       await _todosDB.doc(todo.uid).update(todo.toJson());
       await _uploadImage(todo, todo.uid);
+      settingTodo = false;
+      notifyListeners();
     } else {
+      settingTodo = false;
+      notifyListeners();
       throw AlreadyExistsException('There is already a TODO with this title.');
     }
-    settingTodo = false;
-    notifyListeners();
   }
 
   /// Delete a todo based on its [uid].
-  Future<void> deleteTodo(String uid) async => _todosDB.doc(uid).delete();
+  Future<void> deleteTodo(String uid) async {
+    await _todosDB.doc(uid).delete();
+    searchedTodo = null;
+    notifyListeners();
+  }
 
   /// Search a todo based on its [title], returns [null] if none is found.
   Future<Todo> searchByTitle(String title) async {
     final QuerySnapshot res = await _todosDB.where('title', isEqualTo: title).get();
     if (res.size == 1) {
-      return Todo.fromJson(<String, Object>{
+      searchedTodo = Todo.fromJson(<String, Object>{
         'uid': res.docs[0].id,
         ...res.docs[0].data(),
       });
+      notifyListeners();
+      return searchedTodo;
     }
+    searchedTodo = null;
+    notifyListeners();
     return null;
   }
 
